@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuis Konsep Konversi Sinyal – Kontrol dan Akuisisi Data</title>
+<style>
+:root{--navy:#14215a;--navy2:#1e3a8a;--blue:#2563eb;--light:#eef3fd;--line:#d5deef;--ok:#16a34a;--okbg:#e8f7ee;--bad:#dc2626;--badbg:#fdeceb;--txt:#1a2238;--mut:#5b6478;--bg:#f4f6fb}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.55}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+header.top{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;border-radius:14px;padding:22px 24px;margin-bottom:16px}
+header.top h1{margin:0 0 4px;font-size:1.45rem}
+header.top p{margin:0;opacity:.88;font-size:.95rem}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 2px 8px rgba(20,33,90,.06);margin-bottom:16px}
+h2{color:var(--navy);margin-top:0}
+label{display:block;font-weight:600;margin:14px 0 5px;color:var(--navy)}
+input,select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:1rem;font-family:inherit;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--blue)}
+.btn{display:inline-block;border:0;border-radius:9px;padding:11px 20px;font-size:1rem;font-weight:600;cursor:pointer;background:var(--blue);color:#fff;font-family:inherit}
+.btn:hover{background:var(--navy2)}
+.btn.sec{background:#fff;color:var(--navy);border:1.5px solid var(--line)}
+.btn.sec:hover{background:var(--light)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.info{background:var(--light);border-left:4px solid var(--blue);padding:12px 14px;border-radius:8px;font-size:.93rem;margin:14px 0}
+.err{color:var(--bad);font-size:.9rem;margin-top:10px;min-height:1.2em}
+.hidden{display:none!important}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+.bar>i{display:block;height:100%;width:0;background:var(--blue);transition:width .25s}
+.meta{display:flex;justify-content:space-between;font-size:.88rem;color:var(--mut);flex-wrap:wrap;gap:6px}
+.qtext{font-size:1.08rem;font-weight:600;margin:10px 0 16px}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:10px;cursor:pointer;background:#fff;width:100%;text-align:left;font-size:1rem;font-family:inherit;color:var(--txt)}
+.opt:hover{border-color:var(--blue);background:var(--light)}
+.opt.sel{border-color:var(--blue);background:var(--light);box-shadow:inset 0 0 0 1px var(--blue)}
+.opt b{flex:0 0 28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:16px}
+.grid button{padding:7px 0;border:1.5px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;font-weight:600;color:var(--mut);font-family:inherit}
+.grid button.done{background:var(--light);border-color:var(--blue);color:var(--navy)}
+.grid button.cur{background:var(--navy);color:#fff;border-color:var(--navy)}
+.score{text-align:center;padding:10px 0}
+.score .big{font-size:3.6rem;font-weight:800;color:var(--navy);line-height:1}
+.score .pred{font-weight:700;font-size:1.15rem;margin-top:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.stats div{background:var(--light);border-radius:10px;padding:10px;text-align:center}
+.stats strong{display:block;font-size:1.4rem;color:var(--navy)}
+table.id{width:100%;border-collapse:collapse;margin:10px 0}
+table.id td{padding:6px 8px;border-bottom:1px solid var(--line)}
+table.id td:first-child{width:140px;color:var(--mut)}
+.rev{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px;background:#fff;break-inside:avoid;page-break-inside:avoid}
+.rev.ok{border-left:6px solid var(--ok)}
+.rev.no{border-left:6px solid var(--bad)}
+.rev h4{margin:0 0 8px;font-size:1rem}
+.ro{padding:6px 10px;border-radius:7px;margin:4px 0;font-size:.95rem}
+.ro.c{background:var(--okbg);border:1px solid var(--ok)}
+.ro.w{background:var(--badbg);border:1px solid var(--bad)}
+.exp{background:var(--light);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:.93rem}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;color:#fff}
+.tag.ok{background:var(--ok)}.tag.no{background:var(--bad)}
+footer{text-align:center;color:var(--mut);font-size:.82rem;padding:10px}
+.printhead{display:none}
+@media(max-width:560px){.grid{grid-template-columns:repeat(6,1fr)}.stats{grid-template-columns:1fr}}
+@media print{
+ body{background:#fff}
+ .wrap{max-width:none;padding:0}
+ header.top,#screenStart,#screenQuiz,.noprint,footer{display:none!important}
+ .card{box-shadow:none;border:0;padding:0}
+ .printhead{display:block;border-bottom:3px solid var(--navy);margin-bottom:12px;padding-bottom:8px}
+ .printhead h2{margin:0}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+ <h1>⚡ Kuis Konsep Konversi Sinyal</h1>
+ <p>Kontrol dan Akuisisi Data · Pertemuan 10 · Universitas Bina Sarana Informatika</p>
+</header>
+
+<!-- START -->
+<section id="screenStart" class="card">
+ <h2>Data Peserta</h2>
+ <div class="info">Materi: Signal Conditioning, Analog to Digital Converter (ADC), filter frekuensi, dan loading effect. <b>30 soal pilihan ganda</b>. Kuis hanya dapat dikerjakan <b>satu kali</b> per NIM. Pembahasan dan nilai tampil setelah kuis diselesaikan.</div>
+ <label for="nama">Nama Lengkap</label>
+ <input id="nama" type="text" placeholder="Masukkan nama lengkap" autocomplete="off">
+ <label for="nim">NIM</label>
+ <input id="nim" type="text" inputmode="numeric" placeholder="Masukkan NIM" autocomplete="off">
+ <label for="prodi">Program Studi</label>
+ <select id="prodi">
+  <option>Teknik Elektro</option>
+  <option>Teknik Komputer</option>
+  <option>Teknik Industri</option>
+  <option>Sistem Informasi</option>
+  <option>Teknik Informatika</option>
+  <option>Lainnya</option>
+ </select>
+ <div class="err" id="err"></div>
+ <button class="btn" id="btnStart" style="margin-top:8px">Mulai Kuis →</button>
+</section>
+
+<!-- QUIZ -->
+<section id="screenQuiz" class="hidden">
+ <div class="card">
+  <div class="meta"><span id="who"></span><span id="answered"></span></div>
+  <div class="bar"><i id="pb"></i></div>
+  <div class="meta"><strong id="qno" style="color:var(--navy)"></strong></div>
+  <div class="qtext" id="qtext"></div>
+  <div id="opts"></div>
+  <div class="nav">
+   <button class="btn sec" id="prev">← Sebelumnya</button>
+   <button class="btn" id="next">Berikutnya →</button>
+   <button class="btn hidden" id="finish" style="background:var(--ok)">Selesai &amp; Lihat Nilai ✓</button>
+  </div>
+  <div class="grid" id="grid"></div>
+ </div>
+</section>
+
+<!-- RESULT -->
+<section id="screenResult" class="hidden">
+ <div class="card">
+  <div class="printhead"><h2>Hasil Kuis Konsep Konversi Sinyal</h2><div>Kontrol dan Akuisisi Data · Pertemuan 10 · Universitas Bina Sarana Informatika</div></div>
+  <h2 class="noprint">Hasil Kuis</h2>
+  <table class="id" id="idtable"></table>
+  <div class="score">
+   <div class="big" id="sc"></div>
+   <div class="pred" id="pred"></div>
+  </div>
+  <div class="stats">
+   <div><strong id="sBenar"></strong>Benar</div>
+   <div><strong id="sSalah"></strong>Salah</div>
+   <div><strong id="sKosong"></strong>Tidak dijawab</div>
+  </div>
+  <div id="oldNote" class="info hidden noprint">Kuis ini sudah pernah Anda kerjakan. Berikut hasil yang tersimpan.</div>
+  <div class="nav noprint" style="margin-top:18px">
+   <button class="btn" id="btnPdf">🖨️ Simpan ke PDF</button>
+  </div>
+  <div class="info noprint">Pada jendela cetak, pilih tujuan <b>“Simpan sebagai PDF”</b> (Save as PDF).</div>
+ </div>
+ <h2 style="margin:18px 4px 10px;color:var(--navy)">Pembahasan Soal</h2>
+ <div id="review"></div>
+</section>
+<footer>© Kontrol dan Akuisisi Data – Universitas Bina Sarana Informatika</footer>
+</div>
+
+<script>
+const Q=[
+{q:"Apa fungsi utama signal conditioning dalam sistem instrumentasi?",o:["Menghasilkan energi listrik untuk sensor","Mengolah dan menerjemahkan sinyal sensor agar dipahami sistem penerima digital","Menyimpan data sensor ke dalam memori permanen","Mengganti sensor dengan aktuator"],a:1,e:"Signal conditioning adalah jembatan penerjemah antara sensor fisik dan sistem digital. Sinyal mentah sensor sering terlalu kecil, tidak linear, penuh noise, atau bentuk besaran listriknya tidak sesuai."},
+{q:"Manakah yang BUKAN kondisi umum sinyal keluaran sensor mentah?",o:["Terlalu kecil","Tidak linear","Penuh noise","Selalu sudah berupa kode biner yang siap dibaca mikrokontroler"],a:3,e:"Sinyal mentah umumnya analog dan belum siap dibaca digital. Karena itu diperlukan signal conditioning dan ADC untuk mengubahnya menjadi kode biner."},
+{q:"Berapa jumlah komponen utama signal conditioning yang dibahas pada materi?",o:["4 komponen","5 komponen","6 komponen","8 komponen"],a:2,e:"Enam komponen: level sinyal (amplification & attenuation), linearisasi, konversi (R → V → I), ADC, filtering, dan impedance."},
+{q:"Teknik yang dipakai ketika sensor menghasilkan sinyal sangat lemah (misalnya 50 mV) agar terbaca jelas oleh sistem adalah …",o:["Amplification (penguatan)","Attenuation (pelemahan)","Notch filtering","Quantization"],a:0,e:"Amplification memperbesar amplitudo sinyal lemah dengan gain Av = Vout/Vin sehingga sinyal berada pada rentang kerja yang terbaca."},
+{q:"Sensor menghasilkan 50 mV dan dikuatkan dengan Av = 50. Berapa tegangan keluarannya?",o:["1,0 V","2,5 V","5,0 V","25 V"],a:1,e:"Vout = Av × Vin = 50 × 50 mV = 2.500 mV = 2,5 V."},
+{q:"Sensor mengirim tegangan 10 V, sedangkan alat penerima hanya sanggup menerima maksimal 5 V. Solusi yang tepat adalah …",o:["Amplifier dengan gain 2","Notch filter 50 Hz","Resistor pembagi tegangan (attenuation)","ADC 12-bit"],a:2,e:"Tegangan harus diturunkan separuhnya menggunakan resistor pembagi (voltage divider), yaitu attenuation."},
+{q:"Pada rangkaian pembagi tegangan Vout = Vin × R2/(R1 + R2), jika Vin = 10 V dan R1 = R2 = 10 kΩ, maka Vout = …",o:["10 V","7,5 V","2 V","5 V"],a:3,e:"Vout = 10 × 10k/(10k + 10k) = 10 × 0,5 = 5 V."},
+{q:"Tujuan linearisasi pada signal conditioning adalah …",o:["Membuat hubungan input dan output proporsional secara konstan","Memperbesar amplitudo sinyal","Menghilangkan gangguan listrik 50 Hz","Mengubah arus menjadi tegangan"],a:0,e:"Pada karakteristik nonlinier, perubahan fisik menghasilkan lonjakan tegangan yang tidak proporsional. Linearisasi memperbaikinya agar hubungan input-output konstan."},
+{q:"Persamaan yang menggambarkan karakteristik linear adalah …",o:["y = ax²","y = mx + c","y = 1/x","y = eˣ"],a:1,e:"Karakteristik linear dinyatakan dengan garis lurus y = mx + c (m = kemiringan, c = offset)."},
+{q:"Sensor LDR atau thermistor mengubah besaran fisik menjadi perubahan resistansi. Rangkaian yang digunakan untuk mengubahnya menjadi tegangan adalah …",o:["Penyearah (rectifier)","Transformator","Voltage divider atau Wheatstone bridge","Osilator kristal"],a:2,e:"Konversi resistansi → tegangan dilakukan dengan voltage divider atau Wheatstone bridge, dengan output standar berupa tegangan (V)."},
+{q:"Mengapa standar sinyal 4–20 mA banyak dipakai di industri?",o:["Karena menghemat daya listrik","Karena lebih murah dibanding sinyal tegangan","Karena memperbesar resolusi ADC","Karena sangat kebal terhadap gangguan transmisi kabel jarak jauh di lingkungan pabrik"],a:3,e:"Sinyal arus tidak terpengaruh oleh jatuh tegangan sepanjang kabel dan lebih tahan noise, sehingga cocok untuk transmisi jarak jauh."},
+{q:"Sinyal transmisi 20 mA dilewatkan melalui resistor 250 Ω di sisi penerima. Tegangan yang dihasilkan adalah …",o:["5 V","4 V","12,5 V","0,08 V"],a:0,e:"V = I × R = 0,02 A × 250 Ω = 5 V."},
+{q:"Pada standar 4–20 mA dengan resistor 250 Ω, arus 4 mA (batas bawah) menghasilkan tegangan …",o:["0,25 V","0,5 V","1 V","4 V"],a:2,e:"V = 0,004 A × 250 Ω = 1 V. Jadi rentang 4–20 mA setara dengan 1–5 V."},
+{q:"Urutan tiga tahap proses konversi analog ke digital pada ADC adalah …",o:["Encoding → Sampling → Quantization","Sampling → Quantization → Encoding","Quantization → Sampling → Encoding","Sampling → Encoding → Quantization"],a:1,e:"ADC bekerja dengan sampling (mengambil nilai pada interval waktu), quantization (membulatkan ke level diskrit), lalu encoding (mengubah ke kode biner)."},
+{q:"Tahap sampling pada ADC adalah …",o:["Mengambil “foto” nilai sinyal pada interval waktu reguler","Mengelompokkan nilai ke anak tangga diskrit terdekat","Menerjemahkan level menjadi kode biner","Menyaring noise frekuensi tinggi"],a:0,e:"Sampling mengambil nilai sesaat dari sinyal kontinu pada selang waktu yang teratur."},
+{q:"Tahap quantization pada ADC adalah …",o:["Menerjemahkan sinyal menjadi barisan kode biner","Mengambil nilai sinyal setiap interval waktu","Memperkuat sinyal yang lemah","Mengelompokkan titik hasil sampling ke “anak tangga” nilai diskrit terdekat"],a:3,e:"Quantization membulatkan setiap titik hasil sampling ke level diskrit terdekat sehingga nilai kontinu menjadi tingkat-tingkat tertentu."},
+{q:"Tahap encoding pada ADC menghasilkan …",o:["Frekuensi sampling yang lebih tinggi","Barisan kode digital biner dari tingkat anak tangga hasil kuantisasi","Sinyal analog yang lebih halus","Tegangan referensi baru"],a:1,e:"Encoding menerjemahkan tingkat anak tangga menjadi kode biner, misalnya 101011."},
+{q:"Berapa jumlah level (N) yang dimiliki ADC 10-bit?",o:["256 level","512 level","1.024 level","4.096 level"],a:2,e:"N = 2ⁿ = 2¹⁰ = 1.024 level (nilai digital 0 sampai 1023)."},
+{q:"ADC 12-bit, seperti standar pada ESP32, memiliki jumlah level sebanyak …",o:["4.096 level","1.024 level","256 level","8.192 level"],a:0,e:"N = 2¹² = 4.096 level (nilai digital 0 sampai 4095)."},
+{q:"Semakin tinggi resolusi ADC (jumlah bit lebih banyak), maka …",o:["Pembacaan menjadi lebih kasar","Jumlah level menjadi lebih sedikit","Tegangan referensi otomatis naik","Pembacaan sensor menjadi lebih halus dan presisi"],a:3,e:"Resolusi menentukan seberapa halus dan presisi pembacaan sensor. Resolusi rendah (8-bit = 256 level) lebih kasar daripada 10-bit atau 12-bit."},
+{q:"ADC 10-bit dengan tegangan referensi 5 V membaca sinyal sensor 2,5 V. Hasil pembacaan digitalnya adalah …",o:["256","512","1023","2500"],a:1,e:"2,5 V / 5 V × 1023 = 511,5 ≈ 512, tepat di titik tengah rentang."},
+{q:"Kesimpulan dari studi kasus pembacaan ADC 10-bit pada materi adalah …",o:["Mikrokontroler membaca tegangan langsung dalam satuan volt","Mikrokontroler hanya dapat membaca 0 V dan 5 V","Mikrokontroler tidak melihat “2,5 V”, ia hanya melihat angka absolut, misalnya 512","Mikrokontroler mengabaikan sinyal di bawah 5 V"],a:2,e:"Mikrokontroler hanya mengolah angka hasil ADC. Konversi kembali ke satuan fisik (volt, °C, dan seterusnya) dilakukan lewat perhitungan program."},
+{q:"Low-pass filter berfungsi untuk …",o:["Hanya melewatkan frekuensi rendah, misalnya meredam noise frekuensi tinggi pada sensor suhu yang lambat","Hanya melewatkan frekuensi tinggi","Hanya melewatkan satu pita frekuensi di tengah","Membuang satu titik frekuensi tertentu"],a:0,e:"Low-pass filter meloloskan frekuensi rendah dan meredam frekuensi tinggi. Cocok untuk sensor suhu yang perubahannya lambat."},
+{q:"High-pass filter paling tepat digunakan untuk …",o:["Meredam noise frekuensi tinggi pada sensor suhu","Membuang gangguan humming 50 Hz","Meloloskan sinyal pada pita frekuensi tengah","Menghapus tegangan DC statis atau perubahan yang sangat lambat"],a:3,e:"High-pass filter hanya melewatkan frekuensi tinggi, sehingga komponen DC statis dan perubahan sangat lambat tertahan."},
+{q:"Untuk membuang gangguan humming listrik PLN pada frekuensi 50 Hz, filter yang paling sesuai adalah …",o:["Low-pass filter","Notch filter","High-pass filter","Band-pass filter"],a:1,e:"Notch filter membuang atau memotong tepat pada satu titik frekuensi spesifik, misalnya 50 Hz."},
+{q:"Frekuensi cut-off filter RC orde-1 dihitung dengan f_c = 1/(2πRC). Jika R = 1 kΩ dan C = 1 µF, maka f_c ≈ …",o:["1,59 Hz","15,9 Hz","159 Hz","1,59 kHz"],a:2,e:"f_c = 1/(2π × 1000 × 10⁻⁶) = 1/0,006283 ≈ 159 Hz."},
+{q:"Loading effect adalah kondisi di mana …",o:["Alat penerima “membebani” sensor sehingga tegangan asli jatuh drastis sebelum sempat dibaca","Sensor kelebihan panas akibat arus besar","ADC mengalami overflow karena resolusi rendah","Noise listrik PLN masuk ke jalur sinyal"],a:0,e:"Loading effect terjadi akibat ketidaksesuaian impedansi: beban pada sisi penerima menarik arus dari sensor sehingga tegangan turun sebelum terbaca."},
+{q:"Solusi untuk mencegah loading effect adalah …",o:["Menurunkan resolusi ADC","Menambah gain penguat hingga 100 kali","Memasang notch filter 50 Hz","Impedance matching dengan menyisipkan buffer amplifier (voltage follower)"],a:3,e:"Buffer amplifier (voltage follower) bertindak sebagai dinding pelindung arus: impedansi masukan tinggi, impedansi keluaran rendah, sehingga tegangan sensor tidak jatuh."},
+{q:"Pada studi kasus loading effect, R_sensor = 1 kΩ dan R_beban = 1 kΩ dengan sumber 5 V sehingga V_out hanya 2,5 V. Berapa persen tegangan yang hilang?",o:["25%","50%","75%","10%"],a:1,e:"Tegangan turun dari 5 V menjadi 2,5 V, berarti hilang 50% akibat salah penyesuaian impedansi."},
+{q:"Urutan blok pada “The Ultimate Signal Pipeline” dari sensor sampai mikrokontroler adalah …",o:["Sensor → ADC → Filter → Amplifier → Impedance Matching → Mikrokontroler","Sensor → Filter → Amplifier → ADC → Impedance Matching → Mikrokontroler","Sensor → Amplifier & Offset → Filter → Impedance Matching → ADC → Mikrokontroler","Sensor → Impedance Matching → ADC → Amplifier → Filter → Mikrokontroler"],a:2,e:"Sinyal mentah diperkuat dan digeser (offset), difilter dari noise, dilindungi buffer impedance matching, lalu didigitalkan oleh ADC dan dibaca mikrokontroler sebagai data 0–1023 yang bersih."}
+];
+
+const KEY='kuis_p10_kad_';
+const $=id=>document.getElementById(id);
+let user={},ans=new Array(Q.length).fill(null),cur=0;
+
+function show(id){['screenStart','screenQuiz','screenResult'].forEach(s=>$(s).classList.toggle('hidden',s!==id));window.scrollTo(0,0)}
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+
+$('btnStart').onclick=()=>{
+ const nama=$('nama').value.trim(),nim=$('nim').value.trim(),prodi=$('prodi').value;
+ if(nama.length<3){$('err').textContent='Nama lengkap wajib diisi.';return}
+ if(!/^[0-9A-Za-z\-]{5,20}$/.test(nim)){$('err').textContent='NIM tidak valid. Isi NIM dengan benar (minimal 5 karakter).';return}
+ $('err').textContent='';
+ user={nama,nim,prodi};
+ const saved=store(KEY+nim.toLowerCase());
+ if(saved){try{const r=JSON.parse(saved);user=r.user;ans=r.ans;r.time&&(user.time=r.time);showResult(true);return}catch(e){}}
+ $('who').textContent=nama+' · '+nim+' · '+prodi;
+ cur=0;buildGrid();render();show('screenQuiz');
+};
+
+function buildGrid(){
+ const g=$('grid');g.innerHTML='';
+ Q.forEach((_,i)=>{const b=document.createElement('button');b.textContent=i+1;b.onclick=()=>{cur=i;render()};g.appendChild(b)});
+}
+function render(){
+ const q=Q[cur];
+ $('qno').textContent='Soal '+(cur+1)+' dari '+Q.length;
+ $('qtext').textContent=q.q;
+ const box=$('opts');box.innerHTML='';
+ q.o.forEach((t,i)=>{
+  const b=document.createElement('button');b.className='opt'+(ans[cur]===i?' sel':'');
+  const l=document.createElement('b');l.textContent='ABCD'[i];
+  const s=document.createElement('span');s.textContent=t;
+  b.append(l,s);b.onclick=()=>{ans[cur]=i;render()};box.appendChild(b);
+ });
+ const n=ans.filter(x=>x!==null).length;
+ $('answered').textContent='Terjawab: '+n+'/'+Q.length;
+ $('pb').style.width=(n/Q.length*100)+'%';
+ $('prev').disabled=cur===0;
+ $('next').classList.toggle('hidden',cur===Q.length-1);
+ $('finish').classList.toggle('hidden',cur!==Q.length-1);
+ [...$('grid').children].forEach((b,i)=>{b.className=(ans[i]!==null?'done':'')+(i===cur?' cur':'')});
+}
+$('prev').onclick=()=>{if(cur>0){cur--;render()}};
+$('next').onclick=()=>{if(cur<Q.length-1){cur++;render()}};
+$('finish').onclick=()=>{
+ const n=ans.filter(x=>x===null).length;
+ const msg=n?('Masih ada '+n+' soal belum dijawab. Selesaikan kuis sekarang?'):'Selesaikan kuis dan lihat nilai? Jawaban tidak dapat diubah setelah ini.';
+ if(!confirm(msg))return;
+ user.time=new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'});
+ store(KEY+user.nim.toLowerCase(),JSON.stringify({user,ans,time:user.time}));
+ showResult(false);
+};
+
+function showResult(old){
+ let benar=0,kosong=0;
+ ans.forEach((a,i)=>{if(a===null)kosong++;else if(a===Q[i].a)benar++});
+ const salah=Q.length-benar-kosong;
+ const nilai=Math.round(benar/Q.length*100);
+ const t=$('idtable');t.innerHTML='';
+ [['Nama',user.nama],['NIM',user.nim],['Program Studi',user.prodi],['Waktu',user.time||new Date().toLocaleString('id-ID',{dateStyle:'long',timeStyle:'short'})]].forEach(r=>{
+  const tr=document.createElement('tr'),a=document.createElement('td'),b=document.createElement('td');
+  a.textContent=r[0];b.textContent=r[1];b.style.fontWeight='600';tr.append(a,b);t.appendChild(tr);
+ });
+ $('sc').textContent=nilai;
+ const p=nilai>=85?['Sangat Baik','#16a34a']:nilai>=70?['Baik','#2563eb']:nilai>=55?['Cukup','#d97706']:['Perlu Belajar Lagi','#dc2626'];
+ $('pred').textContent=p[0];$('pred').style.color=p[1];
+ $('sBenar').textContent=benar;$('sSalah').textContent=salah;$('sKosong').textContent=kosong;
+ $('oldNote').classList.toggle('hidden',!old);
+ const rv=$('review');rv.innerHTML='';
+ Q.forEach((q,i)=>{
+  const ok=ans[i]===q.a;
+  const d=document.createElement('div');d.className='rev '+(ok?'ok':'no');
+  const h=document.createElement('h4');h.textContent=(i+1)+'. '+q.q;
+  const tag=document.createElement('span');tag.className='tag '+(ok?'ok':'no');tag.textContent=ok?'Benar':(ans[i]===null?'Tidak dijawab':'Salah');
+  h.appendChild(tag);d.appendChild(h);
+  q.o.forEach((t,j)=>{
+   if(j===q.a||j===ans[i]){
+    const o=document.createElement('div');o.className='ro '+(j===q.a?'c':'w');
+    o.textContent='ABCD'[j]+'. '+t+(j===q.a?'  ✓ Jawaban benar':'  ✗ Jawaban Anda');
+    d.appendChild(o);
+   }
+  });
+  const e=document.createElement('div');e.className='exp';
+  const s=document.createElement('b');s.textContent='Pembahasan: ';
+  e.append(s,document.createTextNode(q.e));d.appendChild(e);rv.appendChild(d);
+ });
+ show('screenResult');
+}
+$('btnPdf').onclick=()=>{
+ const old=document.title;
+ document.title='Hasil_Kuis_P10_'+user.nim+'_'+user.nama.replace(/\s+/g,'_');
+ window.print();
+ setTimeout(()=>document.title=old,500);
+};
+</script>
+</body>
+</html>
